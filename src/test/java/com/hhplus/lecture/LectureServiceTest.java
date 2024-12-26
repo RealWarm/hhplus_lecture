@@ -65,6 +65,73 @@ public class LectureServiceTest {
         assertThat(result.get(0).getUserId()).isEqualTo(11L);
     }//registLecture_Success
 
+    @Test
+    @DisplayName("동일한 유저 정보로 같은 특강을 5번 신청했을 때 1번만 성공")
+    public void registJustOneTimeAvailable() {
+        int userTry = 5;
+        int failCnt = 0;
+        // given
+        LectureApplyRequest request = new LectureApplyRequest(userId, lectureId);
+
+        // when
+        for (int i = 0; i < userTry; i++) {
+            try {
+                lectureService.registLecture(request);
+            } catch (Exception e) {
+                failCnt++;
+            }//try
+        }//for-i
+
+
+        List<Registration> result = registrationRepository.findByLectureId(lectureId);
+
+        assertThat(result).hasSize(1);
+        assertThat(failCnt).isEqualTo(4);
+    }//registJustOneTimeAvailable
+
+
+    @Test
+    @DisplayName("동일한 유저 정보로 같은 특강을 동시에 5번 신청했을 때 1번만 성공")
+    public void registJustOneTimeAvailable2() throws InterruptedException {
+        // given
+        int threadCnt = 5;
+        int expectedSuccessCnt = 1;
+        int expectedFailCnt = 4;
+        CountDownLatch latch = new CountDownLatch(threadCnt);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCnt);
+        AtomicInteger successCnt = new AtomicInteger();
+        AtomicInteger failCnt = new AtomicInteger();
+
+        // when
+        for (int i = 0; i < threadCnt; i++) {
+            executorService.execute(() -> {
+                try {
+                    Long userId = 2L;
+                    Long lectureId = 2L;
+                    LectureApplyRequest request = new LectureApplyRequest(userId, lectureId);
+                    lectureService.registLecture(request);
+
+                    successCnt.getAndIncrement();
+                } catch (Exception e) {
+                    failCnt.getAndIncrement();
+                } finally {
+                    latch.countDown();
+                }//try
+            });
+        }//for-i
+
+        latch.await();
+        executorService.shutdown();
+
+        Lecture testedLecture = lectureRepository.findById(lectureId).get();
+        List<Registration> registrations = registrationRepository.findByLectureId(lectureId);
+
+        assertThat(registrations).hasSize(1);
+        assertThat(testedLecture.getCurrentCapacity()).isEqualTo(expectedSuccessCnt);
+        assertThat(successCnt.get()).isEqualTo(expectedSuccessCnt);
+        assertThat(failCnt.get()).isEqualTo(expectedFailCnt);
+    }//registJustOneTimeAvailable
+
 
     @Test
     @DisplayName("수강 인원이 30명인 특강을 동시에 40명의 유저가 수강 신청하면 딱 30명만 수강 신청 완료가 된다.")
