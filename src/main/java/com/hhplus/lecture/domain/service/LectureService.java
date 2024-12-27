@@ -48,16 +48,16 @@ public class LectureService {
         // 수강기간이 지난 강의는 신청하지 못한다.
         lecture.isApplicationPeriod(LocalDateTime.now());
 
-        // 공석이 존재하면 현재 수강인원 1증가, 공석이 없으면 LectureApplyLimitFullException 발생
-        lecture.checkCurrentCapacity();
-
         // 현재유저가 신청한 이력이있니?
         Optional<Registration> registration = registrationRepository.findByUserIdAndLectureId(userId, lectureId);
         if(registration.isPresent()){
             throw new AlreadyApplyLectureException("이미 신청한 이력이 있습니다.");
         }//if
+
+        // 공석이 존재하면 현재 수강인원 1증가, 공석이 없으면 LectureApplyLimitFullException 발생
         lecture.addCurrentCapacity();
-        // 신청내역을 등록한다.  register
+
+        // 신청내역을 등록한다.
         registrationRepository.save(Registration.builder()
                                                     .lectureId(lectureId)
                                                     .userId(userId)
