@@ -136,7 +136,7 @@ public class LectureServiceTest {
         Lecture testedLecture = lectureRepository.findById(lectureId).get();
         List<Registration> registrations = registrationRepository.findByLectureId(lectureId);
 
-        assertThat(registrations).hasSize(1);
+        assertThat(registrations).hasSize(expectedSuccessCnt);
         assertThat(testedLecture.getCurrentCapacity()).isEqualTo(expectedSuccessCnt);
         assertThat(successCnt.get()).isEqualTo(expectedSuccessCnt);
         assertThat(failCnt.get()).isEqualTo(expectedFailCnt);
@@ -178,7 +178,7 @@ public class LectureServiceTest {
         Lecture testedLecture = lectureRepository.findById(lectureId).get();
         List<Registration> registrations = registrationRepository.findByLectureId(lectureId);
 
-        assertThat(registrations).hasSize(30);
+        assertThat(registrations).hasSize(expectedSuccessCnt);
         assertThat(testedLecture.getCurrentCapacity()).isEqualTo(expectedSuccessCnt);
         assertThat(successCnt.get()).isEqualTo(expectedSuccessCnt);
         assertThat(failCnt.get()).isEqualTo(expectedFailCnt);

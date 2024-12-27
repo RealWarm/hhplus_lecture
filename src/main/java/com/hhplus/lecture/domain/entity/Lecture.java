@@ -49,13 +49,6 @@ public class Lecture {
     }//init
 
 
-    public Boolean checkCurrentCapacity() throws LectureApplyLimitFullException {
-        if(this.currentCapacity>=this.maxCapacity){
-            throw new LectureApplyLimitFullException("공석이 없습니다.");
-        }
-        return true;
-    }
-
     public Integer addCurrentCapacity() throws LectureApplyLimitFullException {
         if(this.currentCapacity>=this.maxCapacity){
             throw new LectureApplyLimitFullException("공석이 없습니다.");

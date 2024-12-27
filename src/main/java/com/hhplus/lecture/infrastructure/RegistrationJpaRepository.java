@@ -14,6 +14,5 @@ public interface RegistrationJpaRepository extends JpaRepository<Registration, L
 
     List<Registration> findByLectureId(Long userId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Registration> findByUserIdAndLectureId(Long userId, Long lectureScheduleId);
 }
