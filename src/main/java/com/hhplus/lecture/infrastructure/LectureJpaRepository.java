@@ -16,7 +16,8 @@ import java.util.Optional;
 public interface LectureJpaRepository extends JpaRepository<Lecture, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Lecture> findById(Long id);
+    @Query("SELECT l FROM Lecture l WHERE l.id = :id")
+    Optional<Lecture> findById(@Param("id") Long id);
 
     Optional<Lecture> findByTitleAndInstructor(String title, String instructor);
 

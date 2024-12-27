@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.repository.Lock;
 
 import java.time.LocalDateTime;
 
@@ -47,6 +48,13 @@ public class Lecture {
         this.currentCapacity = currentCapacity;
     }//init
 
+
+    public Boolean checkCurrentCapacity() throws LectureApplyLimitFullException {
+        if(this.currentCapacity>=this.maxCapacity){
+            throw new LectureApplyLimitFullException("공석이 없습니다.");
+        }
+        return true;
+    }
 
     public Integer addCurrentCapacity() throws LectureApplyLimitFullException {
         if(this.currentCapacity>=this.maxCapacity){
